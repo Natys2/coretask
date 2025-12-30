@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Função de perfil com backup
   function showPerfil() {
     const el = document.getElementById('content-dashboard');
-    let user = carregarDados('user', { nome: 'Natasha', usuario: 'CoreTask User' });
+    let user = carregarDados('user', { nome: 'VersaoTeste', usuario: 'CoreTask User' });
     el.innerHTML = `
       <div class="perfil-area">
         <h2>Perfil</h2>
