@@ -358,6 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
     contentDashboard.innerHTML = `
       <h2>Finanças</h2>
       <div id="anos-financas">
+        <button class="ano-btn" data-ano="2026">2026</button>
         <button class="ano-btn" data-ano="2025">2025</button>
         <button class="ano-btn" data-ano="2024">2024</button>
       </div>
@@ -365,64 +366,184 @@ document.addEventListener('DOMContentLoaded', function () {
       <div id="financas-ano"></div>
     `;
 
-    function renderResumoAno(ano) {
-      let html = `<h3>Resumo do ano ${ano}</h3><table style="width:100%;margin-bottom:20px;">
-        <tr>
-          <th>Mês</th>
-          <th>Total contas</th>
-          <th>Salário</th>
-          <th>Saldo</th>
-          <th>Guardado</th>
-        </tr>`;
-      for (let m = 1; m <= 12; m++) {
+function renderResumoAno(ano) {
+    const contentFinancas = document.getElementById('financas-ano');
+    let dadosFinancas = carregarDados('financas', {});
+    let metas = carregarDados('metas', []);
+    let valoresGuardados = carregarDados('guardados', {});
+    
+    let dividaStatus = carregarDados('divida_critica', { 
+        nome: 'Dívida Prioritária', 
+        total: 0, 
+        economizado: 0,
+        ativa: false 
+    });
+
+    let totalSalarioAno = 0;
+    let totalGastoAno = 0;
+    let prevSaldo = null;
+
+    // Cálculo dos totais para os cards
+    for (let m = 1; m <= 12; m++) {
+        const mesData = dadosFinancas[ano] && dadosFinancas[ano][m] ? dadosFinancas[ano][m] : { salario: 0, contas: [] };
+        const totalPagas = mesData.contas.filter(c => c.pago).reduce((acc, c) => acc + c.valor, 0);
+        totalSalarioAno += mesData.salario;
+        totalGastoAno += totalPagas;
+    }
+
+    let html = `
+      <div style="margin-top: 20px;">
+        <h3>Resumo Financeiro Anual - ${ano}</h3>
+        
+        <div class="resumo-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+          <div class="card-financeiro" style="background: #252525; padding: 15px; border-radius: 10px; border-left: 4px solid #bb86fc; text-align: center;">
+            <h4 style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">SALÁRIO ACUMULADO</h4>
+            <p style="font-size: 1.3rem; font-weight: bold; margin: 0;">R$ ${totalSalarioAno.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+          </div>
+          <div class="card-financeiro" style="background: #252525; padding: 15px; border-radius: 10px; border-left: 4px solid #bb2222; text-align: center;">
+            <h4 style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">TOTAL PAGO (SAÍDAS)</h4>
+            <p style="font-size: 1.3rem; font-weight: bold; margin: 0;">R$ ${totalGastoAno.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+          </div>
+          <div class="card-financeiro" style="background: #252525; padding: 15px; border-radius: 10px; border-left: 4px solid #2ecc40; text-align: center;">
+            <h4 style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">SALDO LIVRE ATUAL</h4>
+            <p style="font-size: 1.3rem; font-weight: bold; margin: 0;">R$ ${(totalSalarioAno - totalGastoAno).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+          </div>
+        </div>
+
+        <div id="dividas-pesadas-container">`;
+    
+    if (dividaStatus.ativa) {
+        html += `
+        <div id="dividas-pesadas" style="margin-bottom: 30px; background: #1a1a1a; padding: 20px; border-radius: 12px; border: 2px solid #dc3545; box-shadow: 0 0 15px rgba(220, 53, 69, 0.2);">
+          <h3 style="color: #dc3545; margin-top: 0; display: flex; align-items: center; gap: 10px;">🚀 ${dividaStatus.nome}</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+              <p style="color: #888; margin: 0; font-size: 0.8rem;">SALDO DEVEDOR TOTAL</p>
+              <h2 style="font-size: 2.2rem; margin: 0; color: #fff;">R$ ${dividaStatus.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</h2>
+              <p style="color: #2ecc40; margin-top: 5px; font-weight: bold;">💰 Juros economizados: R$ ${dividaStatus.economizado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+            </div>
+            <div>
+                <button id="btn-abatir-divida" style="background: #dc3545; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 10px;">Registrar Antecipação</button>
+                <button id="btn-reset-divida" style="background: #444; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer;">⚙️</button>
+            </div>
+          </div>
+        </div>`;
+    } else {
+        html += `
+        <button id="btn-config-divida" style="background: #444; color: #fed71c; margin-bottom: 30px; padding: 15px; border: 1px dashed #fed71c; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold;">
+          + Configurar Dívida Crítica (Esta seção é privada e salva apenas no seu navegador)
+        </button>`;
+    }
+
+    html += `
+        </div>
+
+        <table style="width:100%; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden;">
+          <thead>
+            <tr style="background: #2a2a2a; color: #fed71c; text-align: left;">
+              <th style="padding: 12px;">Mês</th>
+              <th style="padding: 12px; text-align: center;">Entrada</th>
+              <th style="padding: 12px; text-align: center;">Saída</th>
+              <th style="padding: 12px; text-align: center;">Saldo</th>
+              <th style="padding: 12px; text-align: center;">Evolução</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    for (let m = 1; m <= 12; m++) {
         const mesData = dadosFinancas[ano] && dadosFinancas[ano][m] ? dadosFinancas[ano][m] : { salario: 0, contas: [] };
         const totalContas = mesData.contas.reduce((acc, c) => acc + c.valor, 0);
+        const totalPagas = mesData.contas.filter(c => c.pago).reduce((acc, c) => acc + c.valor, 0);
         const totalGuardado = valoresGuardados[ano] && valoresGuardados[ano][m] ? valoresGuardados[ano][m] : 0;
-        const saldo = mesData.salario - mesData.contas.filter(c => c.pago).reduce((acc, c) => acc + c.valor, 0) - totalGuardado;
-        html += `<tr>
-        <td>${["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][m-1]}</td>
-        <td>R$ ${totalContas}</td>
-        <td>R$ ${mesData.salario}</td>
-        <td style="color:${saldo < 0 ? '#bb2222' : '#2ecc40'}">R$ ${saldo}</td>
-        <td>R$ ${totalGuardado}</td>
-      </tr>`;
-      }
-      html += `</table>`;
-      html += `<h4>Progresso das metas</h4><div style="margin-bottom:20px;">`;
-      metas.forEach(meta => {
-        const guardado = Object.values(valoresGuardados).reduce((acc, anoObj) => acc + Object.values(anoObj).reduce((a, v) => a + v, 0), 0);
-        const percent = Math.min(100, Math.round((guardado / meta.valor) * 100));
-        html += `<div style="margin-bottom:10px;">
-          <b>${meta.nome}</b> - R$ ${guardado} / R$ ${meta.valor}
-          <div style="background:#eee;border-radius:8px;overflow:hidden;height:18px;width:100%;margin-top:4px;">
-            <div style="background:#a970ff;height:100%;width:${percent}%;transition:width 0.5s;"></div>
-          </div>
-          <span style="font-size:0.9em;">${percent}%</span>
-        </div>`;
-      });
-      html += `</div>`;
-      html += `<button id="criar-meta-btn" style="background:#fed71c;color:#232323;border:none;padding:8px 16px;border-radius:6px;font-weight:bold;cursor:pointer;margin-bottom:10px;">Criar meta</button>`;
-      document.getElementById('financas-ano').innerHTML = html;
+        const saldoLivre = mesData.salario - totalPagas - totalGuardado;
 
-      document.getElementById('criar-meta-btn').onclick = function () {
-        document.getElementById('financas-ano').innerHTML += `
-          <form id="form-meta" style="margin-top:10px;">
-            <label>Nome da meta:</label>
-            <input type="text" name="nome" required>
-            <label>Valor desejado:</label>
-            <input type="number" name="valor" required>
-            <button type="submit">Salvar meta</button>
-          </form>
-        `;
-        document.getElementById('form-meta').onsubmit = function (ev) {
-          ev.preventDefault();
-          metas.push({ nome: this.nome.value, valor: Number(this.valor.value) });
-          salvarDados('metas', metas);
-          showToast('Meta criada!');
-          renderResumoAno(ano);
-        };
-      };
+        let tendenciaHtml = `<span style="color: #666;">--</span>`;
+        if (prevSaldo !== null && mesData.salario > 0) {
+            if (saldoLivre > prevSaldo) tendenciaHtml = `<span style="color: #2ecc40;">▲ Melhora</span>`;
+            else if (saldoLivre < prevSaldo) tendenciaHtml = `<span style="color: #bb2222;">▼ Queda</span>`;
+        }
+
+        html += `
+          <tr style="border-bottom: 1px solid #333;">
+            <td style="padding: 10px; font-weight: bold;">${["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"][m-1]}</td>
+            <td style="text-align:center;">R$ ${mesData.salario}</td>
+            <td style="text-align:center; color: #aaa;">R$ ${totalContas}</td>
+            <td style="text-align:center; color:${saldoLivre < 0 ? '#bb2222' : '#2ecc40'}; font-weight: bold;">R$ ${saldoLivre.toFixed(2)}</td>
+            <td style="text-align:center;">${tendenciaHtml}</td>
+          </tr>`;
+        
+        if (mesData.salario > 0) prevSaldo = saldoLivre;
     }
+
+    html += `</tbody></table></div>`;
+    
+    // RENDERIZAÇÃO DAS METAS FINANCEIRAS
+    html += `<h4 style="margin-top: 30px;">Progresso das Metas</h4><div id="lista-metas-resumo">`;
+    metas.forEach(meta => {
+        const guardadoGeral = Object.values(valoresGuardados).reduce((acc, anoObj) => acc + Object.values(anoObj).reduce((a, v) => a + v, 0), 0);
+        const percent = Math.min(100, Math.round((guardadoGeral / meta.valor) * 100));
+        html += `
+          <div style="margin-bottom:15px; background: #252525; padding: 10px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span><b>${meta.nome}</b></span>
+                <span>R$ ${guardadoGeral} / R$ ${meta.valor}</span>
+            </div>
+            <div style="background:#444; border-radius:10px; overflow:hidden; height:12px; width:100%;">
+              <div style="background: linear-gradient(90deg, #a970ff, #fed71c); height:100%; width:${percent}%; transition:width 0.5s;"></div>
+            </div>
+          </div>`;
+    });
+    html += `</div>`;
+    html += `<button id="criar-meta-btn" class="btn-primary" style="background:#fed71c; color:#232323; width: 100%; margin-top: 10px;">+ Criar Nova Meta</button>`;
+
+    contentFinancas.innerHTML = html;
+
+
+    if (document.getElementById('btn-config-divida')) {
+        document.getElementById('btn-config-divida').onclick = function() {
+            const nome = prompt("Nome da dívida (ex: Mercado Pago):");
+            const total = parseFloat(prompt("Valor total da dívida atual:"));
+            if (nome && !isNaN(total)) {
+                dividaStatus = { nome, total, economizado: 0, ativa: true };
+                salvarDados('divida_critica', dividaStatus);
+                renderResumoAno(ano);
+            }
+        };
+    }
+
+    // Registrar antecipação
+    if (document.getElementById('btn-abatir-divida')) {
+        document.getElementById('btn-abatir-divida').onclick = function() {
+            const pago = parseFloat(prompt("Quanto você pagou hoje?"));
+            const abatido = parseFloat(prompt("Quanto a dívida diminuiu no total?"));
+            if (!isNaN(pago) && !isNaN(abatido)) {
+                dividaStatus.total -= abatido;
+                dividaStatus.economizado += (abatido - pago);
+                salvarDados('divida_critica', dividaStatus);
+                showToast("Dívida atualizada! 🚀");
+                renderResumoAno(ano);
+            }
+        };
+        
+        document.getElementById('btn-reset-divida').onclick = function() {
+            if(confirm("Deseja resetar ou alterar as configurações desta dívida?")) {
+                localStorage.removeItem('divida_critica');
+                renderResumoAno(ano);
+            }
+        };
+    }
+
+    // Criar metas
+    document.getElementById('criar-meta-btn').onclick = function () {
+        const nome = prompt("Nome da meta:");
+        const valor = parseFloat(prompt("Valor desejado:"));
+        if (nome && !isNaN(valor)) {
+            metas.push({ nome, valor });
+            salvarDados('metas', metas);
+            renderResumoAno(ano);
+        }
+    };
+}
 
     document.querySelectorAll('.ano-btn').forEach(btn => {
       btn.addEventListener('click', function () {
@@ -685,11 +806,18 @@ document.addEventListener('DOMContentLoaded', function () {
           <button id="import-estudos">Importar estudos</button>
           <button id="export-financas">Exportar finanças</button>
           <button id="import-financas">Importar finanças</button>
+          <button id="reset-dados" style="background:#bb2222;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:bold;cursor:pointer;margin-top:10px;">Redefinir todos os dados</button>
         </div>
       </div>      
       <p style="margin-top:20px;font-size:0.9em;color:#aaa;">Desenvolvido por Natasha - 2025</p>
     `;
-    
+    document.getElementById('reset-dados').onclick = () => {
+      if (confirm('Tem certeza que deseja redefinir todos os dados? Isso não pode ser desfeito.')) {
+        localStorage.clear(); 
+        showToast('Todos os dados foram redefinidos!');
+        setTimeout(() => { location.reload(); }, 2500);
+      }
+    }
     document.getElementById('export-tarefas').onclick = () => exportarDados('tarefas');
     document.getElementById('import-tarefas').onclick = () => importarDados('tarefas', showTarefas);
 

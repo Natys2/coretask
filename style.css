@@ -19,7 +19,26 @@ body {
 img{
     max-height: 100px;
 }
+.resumo-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
 
+.card-financeiro {
+  background: #252525;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid var(--primary);
+  text-align: center;
+}
+
+.card-financeiro h4 { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 5px; }
+.card-financeiro p { font-size: 1.4rem; font-weight: bold; color: var(--text-main); margin: 0; background: none; }
+
+.tendencia-subiu { color: var(--success); font-size: 0.8rem; }
+.tendencia-desceu { color: var(--danger); font-size: 0.8rem; }
 input, button {
   width: 100%;
   padding: 10px;
