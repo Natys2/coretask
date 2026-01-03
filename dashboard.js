@@ -1,14 +1,5 @@
 
-const salario = 25000; // Valor fixo do salário mensal ou comentar para usar o valor dinâmico
-
 document.addEventListener('DOMContentLoaded', function () {
-  console.log("Dashboard script carregado.");
-  console.log("Funções disponíveis: showToast(msg), showPerfil(), showTarefas(), showTreino(), showAlimentacao(), showEstudo(), showFinancas()");
-  console.log("Use essas funções no console para testar.");
-  console.log("dados carregado:", localStorage);
-  console.log("Para redefinir os dados, use localStorage.clear() no console.");
-  console.log("Lembre-se de recarregar a página após limpar os dados.");
-  console.log("Divirta-se!");
   function salvarDados(chave, dados) {
     localStorage.setItem(chave, JSON.stringify(dados));
   }
@@ -24,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
       link.classList.add('active');
       const text = link.textContent.trim();
-      if (text.includes('Controle pessoal')) showTarefas();
+      if (text.includes('Controle pessoal')) showResumeMonth();
       if (text.includes('Controle Financeiro')) showFinancas();
       if (text.includes('Controle Geral')) showEstudo();
       if (text.includes('Perfil')) showPerfil();
@@ -43,7 +34,36 @@ document.addEventListener('DOMContentLoaded', function () {
       if (text.includes('Finanças')) showFinancas();
     });
   });
-
+  /*
+  function showResumeMonth() {
+      const el = document.getElementById('content-dashboard');
+      el.innerHTML = `
+        <h2>Resumo do Mensal De Tarefas</h2>
+        <div id="resumo-mes">
+        </div>
+      `;
+      const resumo = carregarDados('resumo-mes', { tarefas: 0, treino: 0, alimentacao: 0, estudo: 0
+      });
+      document.getElementById('resumo-mes').innerHTML = `
+        <span>Resumo das atividades do mês:</span>
+        <p>Voce realizou ${resumo.tarefas} tarefas neste mes!</p>
+        <p>Voce realizou ${resumo.treino} treinos neste mes!</p>
+        <p>Voce registrou ${resumo.alimentacao} refeições neste mes!</p>
+        <p>Voce estudou ${resumo.estudo} vezes neste mes!</p>
+        <hr>
+        <br>
+        <h3>Aqui esta seu resumo visual:</h3>
+        <canvas id="chart-resumo-mes" width="400" height="200" style="background:#1e1e1e; border-radius:8px;">
+          <thead>
+            <tr>
+              <th>Atividade</th>
+              <th>Quantidade</th>
+            </tr> 
+          </thead>
+        </canvas>
+      `;
+    };
+  */
   // TAREFAS
   function showTarefas() {
     const el = document.getElementById('content-dashboard');
