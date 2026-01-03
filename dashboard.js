@@ -376,7 +376,7 @@ function renderResumoAno(ano) {
         nome: 'Dívida Prioritária', 
         total: 0, 
         economizado: 0,
-        ativa: false 
+        ativa: false  
     });
 
     let totalSalarioAno = 0;
