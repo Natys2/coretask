@@ -317,3 +317,118 @@ button {
   #Dashboard { width: 100%; }
   .backup-btns { grid-template-columns: 1fr; }
 }
+/* Fim dos estilos Padrão */
+
+/* Estilizações de cada estilo por seção */
+/* ==========================================================================
+    TAREFAS (ATT 3.0)
+   ========================================================================== */
+
+.tarefas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.data-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-btn-styled {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: var(--primary-light);
+    border-radius: 8px;
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn-styled:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.data-nav h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.tarefa-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #222;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.tarefa-item > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.check-btn-custom {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.check-btn-custom.active {
+    background: var(--primary);
+}
+
+.tarefa-item .actions {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    padding: 7px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.icon-btn img {
+    width: 17px;
+    height: 17px;
+}
+
+
+.icon-btn:hover {
+    border-color: var(--primary-light);
+    background: #333;
+}
+
+.del-btn {
+    background: var(--danger) !important;
+    border-color: var(--danger) !important;
+}
+.del-btn:hover {
+    background: #450a0a !important;
+    border-color: var(--danger) !important;
+}
