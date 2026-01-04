@@ -55,7 +55,6 @@ header {
   font-weight: 800;
   text-decoration: none;
   display: inline-block;
-  color: var(--accent-color);
   background: linear-gradient(135deg, #A970FF 0%, #fed71c 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -132,10 +131,9 @@ main {
 }
 
 /* ==========================================================================
-   3. COMPONENTES PADRONIZADOS (REUTILIZÁVEIS)
+   3. COMPONENTES PADRONIZADOS E NOVOS (ATT 3.0)
    ========================================================================== */
 
-/* Formulários Genéricos */
 form {
   display: flex;
   flex-direction: column;
@@ -166,58 +164,125 @@ form input:focus {
   border-color: var(--accent-yellow);
 }
 
-/* Botões Padrão */
 button {
   cursor: pointer;
   transition: var(--transition);
   font-weight: bold;
   border: none;
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Botões Principais */
 .btn-primary, button[type="submit"], #add-tarefa-btn, #add-treino-btn, #add-refeicao-btn, #add-estudo-btn, #add-salario-btn, #add-conta-btn {
   background-color: var(--primary);
   color: #fff;
   padding: 10px 20px;
 }
 
-.btn-primary:hover, button[type="submit"]:hover {
+.btn-primary:hover, button[type="submit"]:hover, #add-tarefa-btn:hover {
   background-color: var(--primary-light);
   transform: scale(1.02);
 }
 
-/* Botões de Ação na Lista */
-.edit-btn {
-  background-color: #444;
-  color: #fff;
-  padding: 6px 14px;
-  margin-left: 10px;
+/* NOVOS: Estilos de Navegação por Data */
+.nav-btn-styled {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: var(--primary-light);
+  border-radius: 8px;
+  width: 35px;
+  height: 35px;
+  transition: all 0.2s ease;
 }
 
-.edit-btn:hover { background-color: var(--primary); }
-
-.del-btn {
-  background-color: var(--danger);
-  color: #fff;
-  padding: 6px 14px;
+.nav-btn-styled:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
-.del-btn:hover { background-color: #ff4444; }
+/* Seletor de Calendário Oculto */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
 
-/* Items das Listas (Tarefas, Treinos, etc) */
-#content-dashboard p {
-  background: #222;
-  padding: 10px;
+/* NOVOS: Botões de Ação com Ícone (SVG) */
+.icon-btn {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  padding: 8px;
   border-radius: 6px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-left: 5px;
+  transition: 0.2s;
+}
+
+.icon-btn img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.icon-btn:hover {
+  background: #333;
+  border-color: var(--primary-light);
+}
+
+.del-btn:hover {
+  background: #450a0a !important;
+  border-color: var(--danger) !important;
+}
+
+/* Checkbox Circular Customizado */
+.check-btn-custom {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  background: transparent;
+  color: white;
+  margin-right: 12px;
+  font-size: 12px;
+  transition: var(--transition);
+}
+
+.check-btn-custom.active {
+  background: var(--primary);
+}
+
+/* Estilo antigo mantido por compatibilidade */
+.check-btn {
+    background-color: var(--primary);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 /* ==========================================================================
    4. SEÇÕES ESPECÍFICAS
    ========================================================================== */
+
+/* Itens da Lista de Tarefas (Refinado) */
+.tarefa-item {
+  background: #222;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid transparent;
+  transition: 0.3s;
+}
+
+.tarefa-item:hover {
+  border-color: rgba(169, 112, 255, 0.3);
+  background: #282828;
+}
 
 /* Perfil no Dashboard Lateral */
 .user-profile {

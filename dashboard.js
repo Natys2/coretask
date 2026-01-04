@@ -1,3 +1,6 @@
+if (!window.dataVisualizacao) {
+  window.dataVisualizacao = new Date().toLocaleDateString('pt-BR');
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   function salvarDados(chave, dados) {
@@ -34,105 +37,136 @@ document.addEventListener('DOMContentLoaded', function () {
       if (text.includes('Finanças')) showFinancas();
     });
   });
-  /*
-  function showResumeMonth() {
-      const el = document.getElementById('content-dashboard');
-      el.innerHTML = `
-        <h2>Resumo do Mensal De Tarefas</h2>
-        <div id="resumo-mes">
-        </div>
-      `;
-      const resumo = carregarDados('resumo-mes', { tarefas: 0, treino: 0, alimentacao: 0, estudo: 0
-      });
-      document.getElementById('resumo-mes').innerHTML = `
-        <span>Resumo das atividades do mês:</span>
-        <p>Voce realizou ${resumo.tarefas} tarefas neste mes!</p>
-        <p>Voce realizou ${resumo.treino} treinos neste mes!</p>
-        <p>Voce registrou ${resumo.alimentacao} refeições neste mes!</p>
-        <p>Voce estudou ${resumo.estudo} vezes neste mes!</p>
-        <hr>
-        <br>
-        <h3>Aqui esta seu resumo visual:</h3>
-        <canvas id="chart-resumo-mes" width="400" height="200" style="background:#1e1e1e; border-radius:8px;">
-          <thead>
-            <tr>
-              <th>Atividade</th>
-              <th>Quantidade</th>
-            </tr> 
-          </thead>
-        </canvas>
-      `;
-    };
-  */
-  // TAREFAS
-  function showTarefas() {
-    const el = document.getElementById('content-dashboard');
-    el.innerHTML = `
-      <h2>Tarefas de Hoje</h2>
-      <button id="add-tarefa-btn">+ Adicionar tarefa</button>
-      <div id="form-tarefa"></div>
-      <div id="lista-tarefas"></div>
-    `;
-    let tarefas = carregarDados('tarefas', []);
-    renderTarefas();
+ 
+// TAREFAS
+function showTarefas() {
+  const el = document.getElementById('content-dashboard');
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  let tarefas = carregarDados('tarefas', []);
 
-    document.getElementById('add-tarefa-btn').onclick = function () {
+  // Preparação de data para o input date
+  const [d, m, a] = window.dataVisualizacao.split('/');
+  const dataIso = `${a}-${m}-${d}`;
+
+  // Renderiza a Estrutura Base
+  el.innerHTML = `
+    <div class="tarefas-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div class="data-nav" style="display: flex; align-items: center; gap: 10px;">
+        <button id="prev-day" class="nav-btn-styled">◀</button>
+        <div style="position: relative; cursor: pointer;">
+          <h3 style="margin: 0;">Data: ${window.dataVisualizacao}</h3>
+          <input type="date" id="date-picker" value="${dataIso}" 
+            style="position: absolute; opacity: 0; inset: 0; cursor: pointer; width: 100%;">
+        </div>
+        <button id="next-day" class="nav-btn-styled">▶</button>
+      </div>
+      ${window.dataVisualizacao === hoje ? 
+        '<button id="add-tarefa-btn" class="main-btn">+ Adicionar tarefa</button>' : 
+        '<span style="color: #888; font-size: 0.9em; background: #222; padding: 5px 10px; border-radius: 20px;">🔒 Histórico</span>'}
+    </div>
+    <div id="form-tarefa"></div>
+    <div id="lista-tarefas"></div>
+  `;
+
+  // --- Atribuição de Eventos de Navegação ---
+  document.getElementById('prev-day').onclick = () => mudarData(-1);
+  document.getElementById('next-day').onclick = () => mudarData(1);
+  document.getElementById('date-picker').onchange = (e) => {
+    if(!e.target.value) return;
+    const [ano, mes, dia] = e.target.value.split('-');
+    window.dataVisualizacao = `${dia}/${mes}/${ano}`;
+    showTarefas();
+  };
+
+  if (document.getElementById('add-tarefa-btn')) {
+    document.getElementById('add-tarefa-btn').onclick = () => {
       document.getElementById('form-tarefa').innerHTML = `
         <form id="form-add-tarefa">
-          <label>Tarefa:</label>
-          <input type="text" name="tarefa" required>
-          <button type="submit">Salvar</button>
-        </form>
-      `;
-      document.getElementById('form-add-tarefa').onsubmit = function (ev) {
-        ev.preventDefault();
-        tarefas.push({ tarefa: this.tarefa.value });
+          <input type="text" name="tarefa" placeholder="Nova tarefa..." required>
+          <button type="submit" class="btn-primary">Salvar</button>
+        </form>`;
+      
+      document.getElementById('form-add-tarefa').onsubmit = (e) => {
+        e.preventDefault();
+        tarefas.push({ id: Date.now(), tarefa: e.target.tarefa.value, concluida: false, dataCriacao: hoje });
         salvarDados('tarefas', tarefas);
-        this.reset();
         document.getElementById('form-tarefa').innerHTML = '';
         renderTarefas();
       };
     };
-
-    function renderTarefas() {
-      const lista = document.getElementById('lista-tarefas');
-      lista.innerHTML = tarefas.map((t, idx) =>
-        `<p>
-          ${t.tarefa}
-          <button class="edit-btn" data-idx="${idx}">Editar</button>
-          <button class="del-btn" data-idx="${idx}">Excluir</button>
-        </p>`
-      ).join('');
-      lista.querySelectorAll('.del-btn').forEach(btn => {
-        btn.onclick = function () {
-          tarefas.splice(btn.getAttribute('data-idx'), 1);
-          salvarDados('tarefas', tarefas);
-          renderTarefas();
-        };
-      });
-      lista.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.onclick = function () {
-          const idx = btn.getAttribute('data-idx');
-          document.getElementById('form-tarefa').innerHTML = `
-            <form id="form-edit-tarefa">
-              <label>Tarefa:</label>
-              <input type="text" name="tarefa" value="${tarefas[idx].tarefa}" required>
-              <button type="submit">Salvar edição</button>
-            </form>
-          `;
-          document.getElementById('form-edit-tarefa').onsubmit = function (ev) {
-            ev.preventDefault();
-            tarefas[idx].tarefa = this.tarefa.value;
-            salvarDados('tarefas', tarefas);
-            document.getElementById('form-tarefa').innerHTML = '';
-            renderTarefas();
-          };
-        };
-      });
-    }
   }
 
-  // TREINO
+  // --- Função Interna de Renderização ---
+  function renderTarefas() {
+    const lista = document.getElementById('lista-tarefas');
+    const tarefasFiltradas = tarefas.filter(t => t.dataCriacao === window.dataVisualizacao);
+
+    if (tarefasFiltradas.length === 0) {
+      lista.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 10% 0;">
+          <img src="assets/undraw_calendar_8r6s.svg" alt="Vazio" style="width: 50%; max-width: 250px; opacity: 0.5;">
+          <p style="color: #888;">Nenhuma tarefa para esta data.</p>
+        </div>`;
+      return;
+    }
+
+    lista.innerHTML = tarefasFiltradas.map((t) => {
+      const originalIdx = tarefas.findIndex(item => item.id === t.id);
+      return `
+        <div class="tarefa-item">
+          <div style="display: flex; align-items: center;">
+            <button class="check-btn-custom ${t.concluida ? 'active' : ''}" onclick="toggleTarefa(${originalIdx})">
+              ${t.concluida ? '✔' : ''}
+            </button>
+            <span style="text-decoration: ${t.concluida ? 'line-through' : 'none'}; color: ${t.concluida ? '#666' : '#fff'}">
+              ${t.tarefa}
+            </span>
+          </div>
+          <div class="actions">
+            ${window.dataVisualizacao === hoje ? 
+              `<button class="icon-btn edit-btn" onclick="editarTarefa(${originalIdx})"><img src="assets/icons/pencil.svg"></button>` : ''}
+            <button class="icon-btn del-btn" onclick="deletarTarefa(${originalIdx})"><img src="assets/icons/trash.svg"></button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // --- Funções de Ação Globais (para funcionar com o onclick inline) ---
+  window.toggleTarefa = (idx) => {
+    tarefas[idx].concluida = !tarefas[idx].concluida;
+    salvarDados('tarefas', tarefas);
+    renderTarefas();
+  };
+
+  window.deletarTarefa = (idx) => {
+    if(confirm("Excluir tarefa?")) {
+      tarefas.splice(idx, 1);
+      salvarDados('tarefas', tarefas);
+      renderTarefas();
+    }
+  };
+
+  window.editarTarefa = (idx) => {
+    const novo = prompt("Editar:", tarefas[idx].tarefa);
+    if(novo) {
+      tarefas[idx].tarefa = novo;
+      salvarDados('tarefas', tarefas);
+      renderTarefas();
+    }
+  };
+
+  renderTarefas();
+}
+// Função Auxiliar para mudar data
+function mudarData(direcao) {
+  const partes = window.dataVisualizacao.split('/');
+  const dataAtual = new Date(partes[2], partes[1] - 1, partes[0]);
+  dataAtual.setDate(dataAtual.getDate() + direcao);
+  window.dataVisualizacao = dataAtual.toLocaleDateString('pt-BR');
+  showTarefas();
+}
+
+// TREINO
   function showTreino() {
     const el = document.getElementById('content-dashboard');
     el.innerHTML = `
