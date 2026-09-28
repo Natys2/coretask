@@ -160,22 +160,37 @@ function showTarefas() {
 
 
 async function carregarDicaInteligente() {
-  const tarefas = localStorage.getItem('tarefas') || '[]';
-  const financas = localStorage.getItem('financas') || '{}';
-  const estudos = localStorage.getItem('estudos') || '[]';
-  const treinos = localStorage.getItem('treino') || '[]';
-
   const containerDica = document.getElementById('dica-ia-texto');
   if (containerDica) {
     containerDica.textContent = "Gerando seu relatório inteligente...";
   }
 
+  const dataAtual = new Date();
+  const mesAtual = dataAtual.getMonth() + 1;
+  const anoAtual = dataAtual.getFullYear();
+
+  const tarefas = localStorage.getItem('tarefas') || '[]';
+  const financasBrutas = JSON.parse(localStorage.getItem('financas') || '{}');
+  const estudos = localStorage.getItem('estudos') || '[]';
+  const treinos = localStorage.getItem('treino') || '[]';
+
+  let financasFiltradas = {};
+  for (let ano in financasBrutas) {
+    if (Number(ano) <= anoAtual) {
+      financasFiltradas[ano] = {};
+      for (let mes in financasBrutas[ano]) {
+        if (Number(ano) < anoAtual || Number(mes) <= mesAtual) {
+          financasFiltradas[ano][mes] = financasBrutas[ano][mes];
+        }
+      }
+    }
+  }
+
   try {
-    // Agora chama a nossa própria API segura na Vercel (sem expor token nenhum no navegador!)
     const resposta = await fetch('/api/dica', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tarefas, financas, estudos, treinos })
+      body: JSON.stringify({ tarefas, financasFiltradas, estudos, treinos })
     });
 
     const resultado = await resposta.json();
@@ -188,7 +203,7 @@ async function carregarDicaInteligente() {
       }
     }
   } catch (error) {
-    console.error("Erro ao buscar relatório:", error);
+    console.error("Erro ao buscar relatório da IA:", error);
     if (containerDica) {
       containerDica.textContent = "Oii! Tivemos um pequeno problema de conexão ao gerar o relatório.";
     }
