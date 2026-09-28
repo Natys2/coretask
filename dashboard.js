@@ -10,8 +10,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const dados = localStorage.getItem(chave);
     return dados ? JSON.parse(dados) : padrao;
   }
+  let user = JSON.parse(localStorage.getItem('user')) || {};
+  if (!user.nome || user.nome === 'VersaoTeste') {
+    const nomeDigitado = prompt("Oii! Bem-vindo ao CoreTask. Qual é o seu nome?");
+    if (nomeDigitado && nomeDigitado.trim() !== "") {
+      user = { nome: nomeDigitado.trim(), usuario: 'CoreTask User' };
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      user = { nome: 'Convidado', usuario: 'CoreTask User' };
+    }
+  }
 
-  // Navegação principal
+ 
+  const avatarSm = document.querySelector('.avatar-sm');
+  const perfilSpan = document.querySelector('.user-header-profile span');
+  if (avatarSm && perfilSpan) {
+    perfilSpan.textContent = user.nome;
+    const iniciais = user.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    avatarSm.textContent = iniciais || 'CT';
+  }
   document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', function (e) {
       e.preventDefault();
@@ -25,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Quick links
   document.querySelectorAll('.quick-links a').forEach(link => {
     link.addEventListener('click', function (e) {
       e.preventDefault();
@@ -38,17 +54,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
  
-// TAREFAS
 function showTarefas() {
   const el = document.getElementById('content-dashboard');
   const hoje = new Date().toLocaleDateString('pt-BR');
   let tarefas = carregarDados('tarefas', []);
 
-  // Preparação de data para o input date
   const [d, m, a] = window.dataVisualizacao.split('/');
   const dataIso = `${a}-${m}-${d}`;
 
-  // Renderiza a Estrutura Base
   el.innerHTML = `
     <div class="tarefas-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
       <div class="data-nav" style="display: flex; align-items: center; gap: 10px;">
@@ -68,9 +81,8 @@ function showTarefas() {
     <div id="lista-tarefas"></div>
   `;
 
-  // --- Atribuição de Eventos de Navegação ---
-  document.getElementById('prev-day').onclick = () => mudarData(-1);
-  document.getElementById('next-day').onclick = () => mudarData(1);
+  document.getElementById('prev-day').onclick = () => mudarData(-1, showTarefas);
+  document.getElementById('next-day').onclick = () => mudarData(1, showTarefas);
   document.getElementById('date-picker').onchange = (e) => {
     if(!e.target.value) return;
     const [ano, mes, dia] = e.target.value.split('-');
@@ -96,7 +108,6 @@ function showTarefas() {
     };
   }
 
-  // --- Função Interna de Renderização ---
   function renderTarefas() {
     const lista = document.getElementById('lista-tarefas');
     const tarefasFiltradas = tarefas.filter(t => t.dataCriacao === window.dataVisualizacao);
@@ -131,7 +142,6 @@ function showTarefas() {
     }).join('');
   }
 
-  // --- Funções de Ação Globais (para funcionar com o onclick inline) ---
   window.toggleTarefa = (idx) => {
     tarefas[idx].concluida = !tarefas[idx].concluida;
     salvarDados('tarefas', tarefas);
@@ -158,11 +168,342 @@ function showTarefas() {
   renderTarefas();
 }
 
+function showTreino() {
+  const el = document.getElementById('content-dashboard');
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  let treinos = carregarDados('treino', []);
+
+  const [d, m, a] = window.dataVisualizacao.split('/');
+  const dataIso = `${a}-${m}-${d}`;
+
+  el.innerHTML = `
+    <div class="tarefas-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div class="data-nav" style="display: flex; align-items: center; gap: 10px;">
+        <button id="prev-day-treino" class="nav-btn-styled">◀</button>
+        <div style="position: relative; cursor: pointer;">
+          <h3 style="margin: 0;">Data: ${window.dataVisualizacao}</h3>
+          <input type="date" id="date-picker-treino" value="${dataIso}" 
+            style="position: absolute; opacity: 0; inset: 0; cursor: pointer; width: 100%;">
+        </div>
+        <button id="next-day-treino" class="nav-btn-styled">▶</button>
+      </div>
+      ${window.dataVisualizacao === hoje ? 
+        '<button id="add-treino-btn" class="main-btn">+ Adicionar exercício</button>' : 
+        '<span style="color: #888; font-size: 0.9em; background: #222; padding: 5px 10px; border-radius: 20px;">🔒 Histórico</span>'}
+    </div>
+    <div id="form-treino"></div>
+    <div id="lista-treino"></div>
+  `;
+
+  document.getElementById('prev-day-treino').onclick = () => mudarData(-1, showTreino);
+  document.getElementById('next-day-treino').onclick = () => mudarData(1, showTreino);
+  document.getElementById('date-picker-treino').onchange = (e) => {
+    if(!e.target.value) return;
+    const [ano, mes, dia] = e.target.value.split('-');
+    window.dataVisualizacao = `${dia}/${mes}/${ano}`;
+    showTreino();
+  };
+
+  if (document.getElementById('add-treino-btn')) {
+    document.getElementById('add-treino-btn').onclick = () => {
+      document.getElementById('form-treino').innerHTML = `
+        <form id="form-add-treino" style="background: var(--bg-form); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+          <input type="text" name="exercicio" placeholder="Nome do exercício (ex: Leg Press)" required style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+          <div style="display: flex; gap: 10px;">
+            <input type="number" name="series" placeholder="Séries (ex: 4)" required style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+            <input type="number" name="repeticoes" placeholder="Repetições (ex: 12)" required style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+            <input type="number" step="0.5" name="peso" placeholder="Peso/Carga (kg)" required style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+          </div>
+          <input type="text" name="progresso" placeholder="Notas de evolução / progresso (ex: Subiu 5kg, executou bem)" style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+          <button type="submit" class="btn-primary" style="padding: 10px; background: var(--primary); border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Salvar Exercício</button>
+        </form>`;
+      
+      document.getElementById('form-add-treino').onsubmit = (e) => {
+        e.preventDefault();
+        treinos.push({
+          id: Date.now(),
+          exercicio: e.target.exercicio.value,
+          series: e.target.series.value,
+          repeticoes: e.target.repeticoes.value,
+          peso: e.target.peso.value,
+          progresso: e.target.progresso.value,
+          dataCriacao: hoje
+        });
+        salvarDados('treino', treinos);
+        document.getElementById('form-treino').innerHTML = '';
+        renderTreinos();
+      };
+    };
+  }
+
+  function renderTreinos() {
+    const lista = document.getElementById('lista-treino');
+    const treinosFiltrados = treinos.filter(t => t.dataCriacao === window.dataVisualizacao);
+
+    if (treinosFiltrados.length === 0) {
+      lista.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 10% 0;">
+          <p style="color: #888;">Nenhum treino registrado para esta data.</p>
+        </div>`;
+      return;
+    }
+
+    lista.innerHTML = treinosFiltrados.map((t) => {
+      const originalIdx = treinos.findIndex(item => item.id === t.id);
+      return `
+        <div style="background: var(--bg-form); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0 0 5px 0; color: var(--primary-light);">${t.exercicio}</h4>
+            <p style="margin: 0; color: #ccc; font-size: 0.9rem;">
+              <b>${t.series}</b> séries x <b>${t.repeticoes}</b> repetições | Carga: <b>${t.peso} kg</b>
+            </p>
+            ${t.progresso ? `<small style="color: var(--success); display: block; margin-top: 4px;">📈 ${t.progresso}</small>` : ''}
+          </div>
+          <div class="actions" style="display: flex; gap: 8px;">
+            <button class="icon-btn del-btn" onclick="deletarTreino(${originalIdx})" style="background: #bb2222; border: none; padding: 6px 10px; border-radius: 4px; color: #fff; cursor: pointer;">Excluir</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.deletarTreino = (idx) => {
+    if(confirm("Excluir exercício?")) {
+      treinos.splice(idx, 1);
+      salvarDados('treino', treinos);
+      renderTreinos();
+    }
+  };
+
+  renderTreinos();
+}
+
+function showAlimentacao() {
+  const el = document.getElementById('content-dashboard');
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  let refeicoes = carregarDados('refeicoes', []);
+
+  const [d, m, a] = window.dataVisualizacao.split('/');
+  const dataIso = `${a}-${m}-${d}`;
+
+  el.innerHTML = `
+    <div class="tarefas-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div class="data-nav" style="display: flex; align-items: center; gap: 10px;">
+        <button id="prev-day-alim" class="nav-btn-styled">◀</button>
+        <div style="position: relative; cursor: pointer;">
+          <h3 style="margin: 0;">Data: ${window.dataVisualizacao}</h3>
+          <input type="date" id="date-picker-alim" value="${dataIso}" 
+            style="position: absolute; opacity: 0; inset: 0; cursor: pointer; width: 100%;">
+        </div>
+        <button id="next-day-alim" class="nav-btn-styled">▶</button>
+      </div>
+      ${window.dataVisualizacao === hoje ? 
+        '<button id="add-refeicao-btn" class="main-btn">+ Adicionar refeição</button>' : 
+        '<span style="color: #888; font-size: 0.9em; background: #222; padding: 5px 10px; border-radius: 20px;">🔒 Histórico</span>'}
+    </div>
+    <div id="form-refeicao"></div>
+    <div id="lista-refeicao"></div>
+  `;
+
+  document.getElementById('prev-day-alim').onclick = () => mudarData(-1, showAlimentacao);
+  document.getElementById('next-day-alim').onclick = () => mudarData(1, showAlimentacao);
+  document.getElementById('date-picker-alim').onchange = (e) => {
+    if(!e.target.value) return;
+    const [ano, mes, dia] = e.target.value.split('-');
+    window.dataVisualizacao = `${dia}/${mes}/${ano}`;
+    showAlimentacao();
+  };
+
+  if (document.getElementById('add-refeicao-btn')) {
+    document.getElementById('add-refeicao-btn').onclick = () => {
+      document.getElementById('form-refeicao').innerHTML = `
+        <form id="form-add-refeicao" style="background: var(--bg-form); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+          <select name="tipo" required style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+            <option value="">Selecione a Refeição</option>
+            <option value="Café da manhã">Café da manhã</option>
+            <option value="Almoço">Almoço</option>
+            <option value="Jantar">Jantar</option>
+            <option value="Outros">Outros / Lanche</option>
+          </select>
+          <input type="time" name="horario" required style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+          <textarea name="descricao" placeholder="O que você comeu / Detalhes..." required style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff; resize: vertical;"></textarea>
+          <button type="submit" class="btn-primary" style="padding: 10px; background: var(--primary); border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Salvar Refeição</button>
+        </form>`;
+      
+      document.getElementById('form-add-refeicao').onsubmit = (e) => {
+        e.preventDefault();
+        refeicoes.push({
+          id: Date.now(),
+          tipo: e.target.tipo.value,
+          horario: e.target.horario.value,
+          descricao: e.target.descricao.value,
+          dataCriacao: hoje
+        });
+        salvarDados('refeicoes', refeicoes);
+        document.getElementById('form-refeicao').innerHTML = '';
+        renderRefeicoes();
+      };
+    };
+  }
+
+  function renderRefeicoes() {
+    const lista = document.getElementById('lista-refeicao');
+    const refeicoesFiltradas = refeicoes.filter(r => r.dataCriacao === window.dataVisualizacao);
+
+    if (refeicoesFiltradas.length === 0) {
+      lista.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 10% 0;">
+          <p style="color: #888;">Nenhuma refeição registrada para esta data.</p>
+        </div>`;
+      return;
+    }
+
+    lista.innerHTML = refeicoesFiltradas.map((r) => {
+      const originalIdx = refeicoes.findIndex(item => item.id === r.id);
+      return `
+        <div style="background: var(--bg-form); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0 0 5px 0; color: var(--accent-yellow);">${r.tipo} <span style="font-size: 0.8rem; color: #888; font-weight: normal;">(${r.horario})</span></h4>
+            <p style="margin: 0; color: #ccc; font-size: 0.95rem;">${r.descricao}</p>
+          </div>
+          <div>
+            <button onclick="deletarRefeicao(${originalIdx})" style="background: #bb2222; border: none; padding: 6px 10px; border-radius: 4px; color: #fff; cursor: pointer;">Excluir</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.deletarRefeicao = (idx) => {
+    if(confirm("Excluir refeição?")) {
+      refeicoes.splice(idx, 1);
+      salvarDados('refeicoes', refeicoes);
+      renderRefeicoes();
+    }
+  };
+
+  renderRefeicoes();
+}
+
+function showEstudo() {
+  const el = document.getElementById('content-dashboard');
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  let estudos = carregarDados('estudos', []);
+
+  const [d, m, a] = window.dataVisualizacao.split('/');
+  const dataIso = `${a}-${m}-${d}`;
+
+  el.innerHTML = `
+    <div class="tarefas-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div class="data-nav" style="display: flex; align-items: center; gap: 10px;">
+        <button id="prev-day-estudo" class="nav-btn-styled">◀</button>
+        <div style="position: relative; cursor: pointer;">
+          <h3 style="margin: 0;">Data: ${window.dataVisualizacao}</h3>
+          <input type="date" id="date-picker-estudo" value="${dataIso}" 
+            style="position: absolute; opacity: 0; inset: 0; cursor: pointer; width: 100%;">
+        </div>
+        <button id="next-day-estudo" class="nav-btn-styled">▶</button>
+      </div>
+      ${window.dataVisualizacao === hoje ? 
+        '<button id="add-estudo-btn" class="main-btn">+ Adicionar estudo</button>' : 
+        '<span style="color: #888; font-size: 0.9em; background: #222; padding: 5px 10px; border-radius: 20px;">🔒 Histórico</span>'}
+    </div>
+    <div id="form-estudo"></div>
+    <div id="lista-estudo"></div>
+  `;
+
+  document.getElementById('prev-day-estudo').onclick = () => mudarData(-1, showEstudo);
+  document.getElementById('next-day-estudo').onclick = () => mudarData(1, showEstudo);
+  document.getElementById('date-picker-estudo').onchange = (e) => {
+    if(!e.target.value) return;
+    const [ano, mes, dia] = e.target.value.split('-');
+    window.dataVisualizacao = `${dia}/${mes}/${ano}`;
+    showEstudo();
+  };
+
+  if (document.getElementById('add-estudo-btn')) {
+    document.getElementById('add-estudo-btn').onclick = () => {
+      document.getElementById('form-estudo').innerHTML = `
+        <form id="form-add-estudo" style="background: var(--bg-form); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+          <input type="text" name="materia" placeholder="Matéria ou Tópico (ex: Programação Web)" required style="padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+          <div style="display: flex; gap: 10px;">
+            <input type="number" name="duracao" placeholder="Duração em minutos (ex: 60)" required style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+            <input type="text" name="topicos" placeholder="O que estudou? (Resumo)" style="flex: 2; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #fff;">
+          </div>
+          <button type="submit" class="btn-primary" style="padding: 10px; background: var(--primary); border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Salvar Estudo</button>
+        </form>`;
+      
+      document.getElementById('form-add-estudo').onsubmit = (e) => {
+        e.preventDefault();
+        estudos.push({
+          id: Date.now(),
+          materia: e.target.materia.value,
+          duracao: e.target.duracao.value,
+          topicos: e.target.topicos.value,
+          dataCriacao: hoje
+        });
+        salvarDados('estudos', estudos);
+        document.getElementById('form-estudo').innerHTML = '';
+        renderEstudos();
+      };
+    };
+  }
+
+  function renderEstudos() {
+    const lista = document.getElementById('lista-estudo');
+    const estudosFiltrados = estudos.filter(e => e.dataCriacao === window.dataVisualizacao);
+
+    if (estudosFiltrados.length === 0) {
+      lista.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 10% 0;">
+          <p style="color: #888;">Nenhum registro de estudo para esta data.</p>
+        </div>`;
+      return;
+    }
+
+    lista.innerHTML = estudosFiltrados.map((e) => {
+      const originalIdx = estudos.findIndex(item => item.id === e.id);
+      return `
+        <div style="background: var(--bg-form); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="margin: 0 0 5px 0; color: #3b82f6;">${e.materia} <span style="font-size: 0.8rem; color: #888; font-weight: normal;">(${e.duracao} min)</span></h4>
+            ${e.topicos ? `<p style="margin: 0; color: #ccc; font-size: 0.9rem;">${e.topicos}</p>` : ''}
+          </div>
+          <div>
+            <button onclick="deletarEstudo(${originalIdx})" style="background: #bb2222; border: none; padding: 6px 10px; border-radius: 4px; color: #fff; cursor: pointer;">Excluir</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.deletarEstudo = (idx) => {
+    if(confirm("Excluir registro de estudo?")) {
+      estudos.splice(idx, 1);
+      salvarDados('estudos', estudos);
+      renderEstudos();
+    }
+  };
+
+  renderEstudos();
+}
+
+function mudarData(direcao, callbackRender) {
+  const partes = window.dataVisualizacao.split('/');
+  const dataAtual = new Date(partes[2], partes[1] - 1, partes[0]);
+  dataAtual.setDate(dataAtual.getDate() + direcao);
+  window.dataVisualizacao = dataAtual.toLocaleDateString('pt-BR');
+  callbackRender();
+}
 
 async function carregarDicaInteligente() {
   const containerDica = document.getElementById('dica-ia-texto');
   if (containerDica) {
     containerDica.textContent = "Gerando seu relatório inteligente...";
+  }
+
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (containerDica) {
+      containerDica.textContent = "Oii, aqui está seu resumo no CoreTask! (A IA integrada via API funciona perfeitamente quando o projeto estiver no ar na Vercel).";
+    }
+    return;
   }
 
   const dataAtual = new Date();
@@ -173,6 +514,7 @@ async function carregarDicaInteligente() {
   const financasBrutas = JSON.parse(localStorage.getItem('financas') || '{}');
   const estudos = localStorage.getItem('estudos') || '[]';
   const treinos = localStorage.getItem('treino') || '[]';
+  const refeicoes = localStorage.getItem('refeicoes') || '[]';
 
   let financasFiltradas = {};
   for (let ano in financasBrutas) {
@@ -190,10 +532,19 @@ async function carregarDicaInteligente() {
     const resposta = await fetch('/api/dica', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tarefas, financasFiltradas, estudos, treinos })
+      body: JSON.stringify({ tarefas, financasFiltradas, estudos, treinos, refeicoes })
     });
 
-    const resultado = await resposta.json();
+    if (!resposta.ok) {
+      throw new Error(`Erro HTTP: ${resposta.status}`);
+    }
+
+    const textoBruto = await resposta.text();
+    if (!textoBruto) {
+      throw new Error('Resposta vazia da API');
+    }
+
+    const resultado = JSON.parse(textoBruto);
     
     if (containerDica) {
       if (resultado.relatorio) {
@@ -205,11 +556,10 @@ async function carregarDicaInteligente() {
   } catch (error) {
     console.error("Erro ao buscar relatório da IA:", error);
     if (containerDica) {
-      containerDica.textContent = "Oii! Tivemos um pequeno problema de conexão ao gerar o relatório.";
+      containerDica.textContent = "Oii, aqui está seu resumo no CoreTask! A cota de testes ou o servidor deu uma pausa, mas seus dados estão salvos e seguros.";
     }
   }
 }
-// 2. O SEU RESUMO GERAL DO MÊS (Atualizado)
 function showResumeMonth() {
   const el = document.getElementById('content-dashboard');
   const dataAtual = new Date();
@@ -294,255 +644,9 @@ function showResumeMonth() {
     </div>
   `;
 
-  // 3. AQUI É ONDE A MÁGICA ACONTECE (Chama a IA quando a tela carrega)
   carregarDicaInteligente();
 }
-// Função Auxiliar para mudar data
-function mudarData(direcao) {
-  const partes = window.dataVisualizacao.split('/');
-  const dataAtual = new Date(partes[2], partes[1] - 1, partes[0]);
-  dataAtual.setDate(dataAtual.getDate() + direcao);
-  window.dataVisualizacao = dataAtual.toLocaleDateString('pt-BR');
-  showTarefas();
-}
 
-// TREINO
-  function showTreino() {
-    const el = document.getElementById('content-dashboard');
-    el.innerHTML = `
-      <h2>Treino</h2>
-      <button id="add-treino-btn">+ Adicionar exercício</button>
-      <div id="form-treino"></div>
-      <div id="lista-treino"></div>
-    `;
-    let treino = carregarDados('treino', []);
-    renderTreino();
-
-    document.getElementById('add-treino-btn').onclick = function () {
-      document.getElementById('form-treino').innerHTML = `
-        <form id="form-add-treino">
-          <label>Exercício:</label>
-          <input type="text" name="exercicio" required>
-          <label>Séries:</label>
-          <input type="number" name="series" required>
-          <label>Repetições:</label>
-          <input type="number" name="repeticoes" required>
-          <button type="submit">Salvar</button>
-        </form>
-      `;
-      document.getElementById('form-add-treino').onsubmit = function (ev) {
-        ev.preventDefault();
-        treino.push({
-          exercicio: this.exercicio.value,
-          series: this.series.value,
-          repeticoes: this.repeticoes.value
-        });
-        salvarDados('treino', treino);
-        this.reset();
-        document.getElementById('form-treino').innerHTML = '';
-        renderTreino();
-      };
-    };
-
-    function renderTreino() {
-      const lista = document.getElementById('lista-treino');
-      lista.innerHTML = treino.map((t, idx) =>
-        `<p>
-          ${t.exercicio} - ${t.series}x${t.repeticoes}
-          <button class="edit-btn" data-idx="${idx}">Editar</button>
-          <button class="del-btn" data-idx="${idx}">Excluir</button>
-        </p>`
-      ).join('');
-      lista.querySelectorAll('.del-btn').forEach(btn => {
-        btn.onclick = function () {
-          treino.splice(btn.getAttribute('data-idx'), 1);
-          salvarDados('treino', treino);
-          renderTreino();
-        };
-      });
-      lista.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.onclick = function () {
-          const idx = btn.getAttribute('data-idx');
-          document.getElementById('form-treino').innerHTML = `
-            <form id="form-edit-treino">
-              <label>Exercício:</label>
-              <input type="text" name="exercicio" value="${treino[idx].exercicio}" required>
-              <label>Séries:</label>
-              <input type="number" name="series" value="${treino[idx].series}" required>
-              <label>Repetições:</label>
-              <input type="number" name="repeticoes" value="${treino[idx].repeticoes}" required>
-              <button type="submit">Salvar edição</button>
-            </form>
-          `;
-          document.getElementById('form-edit-treino').onsubmit = function (ev) {
-            ev.preventDefault();
-            treino[idx].exercicio = this.exercicio.value;
-            treino[idx].series = this.series.value;
-            treino[idx].repeticoes = this.repeticoes.value;
-            salvarDados('treino', treino);
-            document.getElementById('form-treino').innerHTML = '';
-            renderTreino();
-          };
-        };
-      });
-    }
-  }
-
-  // ALIMENTAÇÃO
-  function showAlimentacao() {
-    const el = document.getElementById('content-dashboard');
-    el.innerHTML = `
-      <h2>Alimentação</h2>
-      <button id="add-refeicao-btn">+ Adicionar refeição</button>
-      <div id="form-refeicao"></div>
-      <div id="lista-refeicao"></div>
-    `;
-    let refeicoes = carregarDados('refeicoes', []);
-    renderRefeicao();
-
-    document.getElementById('add-refeicao-btn').onclick = function () {
-      document.getElementById('form-refeicao').innerHTML = `
-        <form id="form-add-refeicao">
-          <label>Refeição:</label>
-          <input type="text" name="refeicao" required>
-          <label>Horário:</label>
-          <input type="time" name="horario" required>
-          <button type="submit">Salvar</button>
-        </form>
-      `;
-      document.getElementById('form-add-refeicao').onsubmit = function (ev) {
-        ev.preventDefault();
-        refeicoes.push({
-          refeicao: this.refeicao.value,
-          horario: this.horario.value
-        });
-        salvarDados('refeicoes', refeicoes);
-        this.reset();
-        document.getElementById('form-refeicao').innerHTML = '';
-        renderRefeicao();
-      };
-    };
-
-    function renderRefeicao() {
-      const lista = document.getElementById('lista-refeicao');
-      lista.innerHTML = refeicoes.map((r, idx) =>
-        `<p>
-          ${r.refeicao} - ${r.horario}
-          <button class="edit-btn" data-idx="${idx}">Editar</button>
-          <button class="del-btn" data-idx="${idx}">Excluir</button>
-        </p>`
-      ).join('');
-      lista.querySelectorAll('.del-btn').forEach(btn => {
-        btn.onclick = function () {
-          refeicoes.splice(btn.getAttribute('data-idx'), 1);
-          salvarDados('refeicoes', refeicoes);
-          renderRefeicao();
-        };
-      });
-      lista.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.onclick = function () {
-          const idx = btn.getAttribute('data-idx');
-          document.getElementById('form-refeicao').innerHTML = `
-            <form id="form-edit-refeicao">
-              <label>Refeição:</label>
-              <input type="text" name="refeicao" value="${refeicoes[idx].refeicao}" required>
-              <label>Horário:</label>
-              <input type="time" name="horario" value="${refeicoes[idx].horario}" required>
-              <button type="submit">Salvar edição</button>
-            </form>
-          `;
-          document.getElementById('form-edit-refeicao').onsubmit = function (ev) {
-            ev.preventDefault();
-            refeicoes[idx].refeicao = this.refeicao.value;
-            refeicoes[idx].horario = this.horario.value;
-            salvarDados('refeicoes', refeicoes);
-            document.getElementById('form-refeicao').innerHTML = '';
-            renderRefeicao();
-          };
-        };
-      });
-    }
-  }
-
-  // ESTUDO
-  function showEstudo() {
-    const el = document.getElementById('content-dashboard');
-    el.innerHTML = `
-      <h2>Estudo</h2>
-      <button id="add-estudo-btn">+ Adicionar atividade</button>
-      <div id="form-estudo"></div>
-      <div id="lista-estudo"></div>
-    `;
-    let estudos = carregarDados('estudos', []);
-    renderEstudo();
-
-    document.getElementById('add-estudo-btn').onclick = function () {
-      document.getElementById('form-estudo').innerHTML = `
-        <form id="form-add-estudo">
-          <label>Matéria/Atividade:</label>
-          <input type="text" name="materia" required>
-          <label>Duração (min):</label>
-          <input type="number" name="duracao" required>
-          <button type="submit">Salvar</button>
-        </form>
-      `;
-      document.getElementById('form-add-estudo').onsubmit = function (ev) {
-        ev.preventDefault();
-        estudos.push({
-          materia: this.materia.value,
-          duracao: this.duracao.value
-        });
-        salvarDados('estudos', estudos);
-        this.reset();
-        document.getElementById('form-estudo').innerHTML = '';
-        renderEstudo();
-      };
-    };
-
-    function renderEstudo() {
-      const lista = document.getElementById('lista-estudo');
-      lista.innerHTML = estudos.map((e, idx) =>
-        `<p>
-          ${e.materia} - ${e.duracao} min
-          <button class="edit-btn" data-idx="${idx}">Editar</button>
-          <button class="del-btn" data-idx="${idx}">Excluir</button>
-        </p>`
-      ).join('');
-      lista.querySelectorAll('.del-btn').forEach(btn => {
-        btn.onclick = function () {
-          estudos.splice(btn.getAttribute('data-idx'), 1);
-          salvarDados('estudos', estudos);
-          renderEstudo();
-        };
-      });
-      lista.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.onclick = function () {
-          const idx = btn.getAttribute('data-idx');
-          document.getElementById('form-estudo').innerHTML = `
-            <form id="form-edit-estudo">
-              <label>Matéria/Atividade:</label>
-              <input type="text" name="materia" value="${estudos[idx].materia}" required>
-              <label>Duração (min):</label>
-              <input type="number" name="duracao" value="${estudos[idx].duracao}" required>
-              <button type="submit">Salvar edição</button>
-            </form>
-          `;
-          document.getElementById('form-edit-estudo').onsubmit = function (ev) {
-            ev.preventDefault();
-            estudos[idx].materia = this.materia.value;
-            estudos[idx].duracao = this.duracao.value;
-            salvarDados('estudos', estudos);
-            document.getElementById('form-estudo').innerHTML = '';
-            renderEstudo();
-          };
-        };
-      });
-    }
-  }
-
-  
-
-  // FINANÇAS
   function showFinancas() {
     const contentDashboard = document.getElementById('content-dashboard');
     let dadosFinancas = carregarDados('financas', {});
@@ -577,7 +681,6 @@ function renderResumoAno(ano) {
     let totalGastoAno = 0;
     let prevSaldo = null;
 
-    // Cálculo dos totais para os cards
     for (let m = 1; m <= 12; m++) {
         const mesData = dadosFinancas[ano] && dadosFinancas[ano][m] ? dadosFinancas[ano][m] : { salario: 0, contas: [] };
         const totalPagas = mesData.contas.filter(c => c.pago).reduce((acc, c) => acc + c.valor, 0);
@@ -671,7 +774,6 @@ function renderResumoAno(ano) {
 
     html += `</tbody></table></div>`;
     
-    // RENDERIZAÇÃO DAS METAS FINANCEIRAS
     html += `<h4 style="margin-top: 30px;">Progresso das Metas</h4><div id="lista-metas-resumo">`;
     metas.forEach(meta => {
         const guardadoGeral = Object.values(valoresGuardados).reduce((acc, anoObj) => acc + Object.values(anoObj).reduce((a, v) => a + v, 0), 0);
@@ -692,7 +794,6 @@ function renderResumoAno(ano) {
 
     contentFinancas.innerHTML = html;
 
-
     if (document.getElementById('btn-config-divida')) {
         document.getElementById('btn-config-divida').onclick = function() {
             const nome = prompt("Nome da dívida (ex: Mercado Pago):");
@@ -705,7 +806,6 @@ function renderResumoAno(ano) {
         };
     }
 
-    // Registrar antecipação
     if (document.getElementById('btn-abatir-divida')) {
         document.getElementById('btn-abatir-divida').onclick = function() {
             const pago = parseFloat(prompt("Quanto você pagou hoje?"));
@@ -727,7 +827,6 @@ function renderResumoAno(ano) {
         };
     }
 
-    // Criar metas
     document.getElementById('criar-meta-btn').onclick = function () {
         const nome = prompt("Nome da meta:");
         const valor = parseFloat(prompt("Valor desejado:"));
@@ -754,8 +853,6 @@ function renderResumoAno(ano) {
         });
         mesesHtml += '</div>';
         document.getElementById('meses-financas').innerHTML = mesesHtml;
-
-        // document.getElementById('financas-ano').innerHTML = '';
 
         document.querySelectorAll('.mes-btn').forEach(mesBtn => {
           mesBtn.addEventListener('click', function () {
@@ -918,15 +1015,7 @@ function renderResumoAno(ano) {
                 renderContas();
               };
             };
-            //logs para debug no console
-            console.log("Dados finanças:", dadosFinancas);
-            console.log("Valores guardados:", valoresGuardados);
-            console.log("Metas:", metas);
-            console.log("Ano selecionado:", ano, "Mês selecionado:", mes);
-            console.log("Salário deste mês:", dadosFinancas[ano][mes].salario);
-            console.log("Contas deste mês:", dadosFinancas[ano][mes].contas);
-            console.log("Funções disponíveis: renderContas() para atualizar a lista de contas após alterações.");
-            console.log("Dados salvos do backup:", localStorage.getItem('financas'), localStorage.getItem('guardados'), localStorage.getItem('metas'));
+
             renderContas();
           });
         });
@@ -934,7 +1023,6 @@ function renderResumoAno(ano) {
     });
   }
 
-  // Funções de exportação/importação, perfil e toast 
   function exportarDados(chave) {
     const dados = localStorage.getItem(chave);
     if (!dados) return showToast('Nenhum dado para exportar!');
@@ -967,13 +1055,10 @@ function renderResumoAno(ano) {
         }
       };
       reader.readAsText(file);
-
     };
     input.click();
-    
   }
 
-  // Função de perfil com backup
   function showPerfil() {
     const el = document.getElementById('content-dashboard');
     let user = carregarDados('user', { nome: 'VersaoTeste', usuario: 'CoreTask User' });
@@ -1028,7 +1113,6 @@ function renderResumoAno(ano) {
     document.getElementById('import-financas').onclick = () => importarDados('financas', showFinancas);
   }
 
-  // Toast de notificação
   function showToast(msg) {
     const toast = document.getElementById('toast-notify');
     toast.textContent = msg;
@@ -1041,10 +1125,7 @@ function renderResumoAno(ano) {
   }
 
   showTarefas();
- 
-  console.log("Bem-vindo ao CoreTask Dashboard!");
   
-  //imports para debug de console.
   window.showToast = showToast;
   window.showPerfil = showPerfil;
   window.showTarefas = showTarefas;
