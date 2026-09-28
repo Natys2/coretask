@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="icon" type="image/png" href="/assets/coretask.png">
+  <script src="dashboard.js" defer></script>
+  <title>CoreTask - Dashboard</title>
+  <!-- Google tag-->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9PHYMB594"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J9PHYMB594');
+  </script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="index.html" class="logo-link">CoreTask</a>
+    </div>
+    
+    <div class="search-area">
+      <input type="text" placeholder="Pesquisar tarefas ou atalhos... (Ctrl+K)">
+    </div>
+
+    <div class="user-header-profile" onclick="showPerfil()">
+      <div class="avatar-sm">NM</div>
+      <span>Natasha</span>
+    </div>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="app-main-container"> 
+    <aside id="Dashboard" class="sidebar-panel">
+      <div class="quick-links">
+        <span class="menu-category">Menu Principal</span>
+        <a href="#" class="" onclick="showResumeMonth()">📅 Resumo</a>
+        <a href="#" class="">📋 Tarefas de hoje</a>
+        <a href="#">💪 Treino</a>
+        <a href="#">🍽️ Alimentação</a>
+        <a href="#">🎓 Estudo</a>
+        <a href="#" id="btn-financas">💸 Finanças</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <a id="btn-config" href="#" onclick="showPerfil()">⚙️ Configurações / Perfil</a>
+        <a id="btn-sair" href="#" onclick="showSobre()"> Saír</a>
+      </div>
+    </aside>
+
+    
+    <section id="content-dashboard">
+        
+    </section>
+  </main>
+
+  <div id="toast-notify" style="display:none;"></div>
+</body>
+</html>
