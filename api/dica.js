@@ -10,7 +10,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Chave de API não configurada no servidor.' });
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+ 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
   const prompt = `Aja como minha parceira de desenvolvimento e produtividade do CoreTask. 
     Analise estes dados do meu sistema:
@@ -31,12 +32,10 @@ export default async function handler(req, res) {
     });
 
     const resultado = await respostaApi.json();
-    
 
-    if (resultado?.error?.code === 429) {
-      return res.status(200).json({ 
-        relatorio: "Oii, aqui está seu resumo no CoreTask! A nossa inteligência artificial pediu uma pausa e atingiu o limite de testes gratuitos de hoje. Mas continue firme nos seus registros!" 
-      });
+    
+    if (resultado?.error) {
+      return res.status(200).json({ relatorio: "ERRO DA API: " + resultado.error.message });
     }
 
     const textoRelatorio = resultado?.candidates?.[0]?.content?.parts?.[0]?.text;
