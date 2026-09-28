@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Chave de API não configurada no servidor.' });
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
   const prompt = `Aja como minha parceira de desenvolvimento e produtividade do CoreTask. 
     Analise estes dados do meu sistema (apenas do histórico real e do mês atual, ignore qualquer mês futuro):
@@ -38,7 +38,6 @@ export default async function handler(req, res) {
 
     const resultado = await respostaApi.json();
     
-    // Se a API do Google retornou erro, vamos enviar o erro exato para a tela para investigarmos
     if (!resultado?.candidates) {
       return res.status(200).json({ relatorio: "ERRO DO GEMINI: " + JSON.stringify(resultado) });
     }
