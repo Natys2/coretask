@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-  
+
   const prompt = `Aja como minha parceira de desenvolvimento e produtividade do CoreTask. 
     Aqui estão os meus dados atuais (apenas do histórico real e do mês atual, ignore qualquer mês futuro):
     - Tarefas: ${tarefas}
@@ -39,12 +39,7 @@ export default async function handler(req, res) {
     const resultado = await respostaApi.json();
 
     if (resultado?.error) {
-      if (resultado.error.message.includes("high demand") || resultado.error.code === 503) {
-        return res.status(200).json({ 
-          relatorio: "Oii, aqui está seu resumo no CoreTask! Os servidores da IA estão com pico de tráfego agora mesmo. Tenta clicar novamente em gerar daqui a pouquinho!" 
-        });
-      }
-      return res.status(200).json({ relatorio: "Mantenha o foco e continue registrando seus hábitos diários!" });
+      return res.status(200).json({ relatorio: "ERRO DA API: " + resultado.error.message });
     }
 
     const textoRelatorio = resultado?.candidates?.[0]?.content?.parts?.[0]?.text;
