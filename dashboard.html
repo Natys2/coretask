@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="dashboard.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
   <link rel="icon" type="image/png" href="/assets/coretask.png">
   <script src="dashboard.js" defer></script>
   <title>CoreTask - Dashboard</title>
@@ -58,5 +60,14 @@
   </main>
 
   <div id="toast-notify" style="display:none;"></div>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => console.log('Service Worker registado com sucesso!', reg))
+        .catch((err) => console.log('Erro ao registar Service Worker:', err));
+    });
+  }
+</script>
 </body>
 </html>

@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="/assets/coretask.png">
   <title>CoreTask - Sua Vida Organizada, Sua Evolução em Um Só Lugar</title>
@@ -129,7 +131,7 @@
           <p>Navegação otimizada para toque direto no celular com experiência de aplicativo.</p>
         </div>
         <div class="roadmap-card">
-          <span class="status-badge planejado">Planejado</span>
+          <span class="status-badge planejado">Ativo</span>
           <h3>Modo PWA Offline</h3>
           <p>Instalação do painel diretamente na tela inicial do dispositivo.</p>
         </div>
@@ -152,10 +154,19 @@
 
   <footer class="landing-footer">
     <div class="footer-info">
-      <p>© 2026 CoreTask. Versão atual: 2.0 • Licença MIT.</p>
+      <p>© 2026 CoreTask. Versão atual: 2.1 • Licença MIT.</p>
       <p>Desenvolvido por <strong>Natasha Souza</strong>.</p>
       <p class="footer-disclaimer">Seus dados pertencem a você. Transparência e autonomia em primeiro lugar.</p>
     </div>
   </footer>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => console.log('Service Worker registado com sucesso!', reg))
+        .catch((err) => console.log('Erro ao registar Service Worker:', err));
+    });
+  }
+</script>
 </body>
 </html>
