@@ -3,120 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CoreTask - Gestão de Produtividade</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
   <link rel="stylesheet" href="style.css">
-  <!-- Google tag-->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9PHYMB594"></script>
-    <script>
+  <link rel="icon" type="image/png" href="/assets/coretask.png">
+  <title>CoreTask - Sua Vida Organizada, Sua Evolução em Um Só Lugar</title>
+  <!-- Google tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9PHYMB594"></script>
+  <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-J9PHYMB594');
+    vercel/vercel-web-analytics-integrati-wjhptv
     </script>
   <!-- Vercel Web Analytics -->
   <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
  </head>
+=======
+  </script>
+</head>
 <body>
-  <header>
-    <a href="index.html" class="logo-link">CoreTask</a>
-    <nav>
-      <a href="#">Início</a>
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="index.html" class="logo-link">CoreTask</a>
+    </div>
+    <nav class="landing-nav">
+      <a href="#inicio">Início</a>
+      <a href="#sobre">A História</a>
+      <a href="#recursos">O Sistema</a>
       <a href="#roadmap">Roadmap</a>
-      <a href="#about">Sobre</a>
-      <a href="#contact">Contato</a>
+      <a href="#contato">Contato</a>
     </nav>
-
+    <div class="cta-nav-area">
+      <a href="dashboard.html" class="btn-primary-sm">Abrir Dashboard</a>
+    </div>
   </header>
-<main>
-    <section id="welcome">
-        <div class="hero-content">
-            <img src="assets/undraw_focused_m9bj.svg" class="hero-img" alt="Ilustração CoreTask">
-            <h1 class="welcome-tag">Bem-vindo ao CoreTask</h1>
-            <h2 class="main-title">Sua Vida Organizada.</h2>
-            <h2 class="main-title highlight">Seus Dados, Seu Poder.</h2>
-            <p class="hero-description">A plataforma completa para gestão de produtividade pessoal e financeira.</p>
-            <button><a href="dashboard.html" class="btn-primary">Acessar Dashboard</a></button>
-        </div>
-    </section>
 
-    <section id="roadmap">
-        <h2>Roadmap de Evolução</h2>
-        <div class="roadmap-container">
-            <div class="card">
-                <span class="icon">🤖</span>
-                <h3>IA Financial Mentor (Em breve!)</h3>
-                <p>Consultoria inteligente baseada nos seus dados para sair do vermelho.</p>
-            </div>
-            <div class="card">
-                <span class="icon">⚡</span>
-                <h3>Performance INP (Estudando Melhoria)</h3>
-                <p>Navegação otimizada para ser sentida como instantânea (<100ms).</p>
-            </div>
-            <div class="card">
-                <span class="icon">📱</span>
-                <h3>Modo PWA (Em breve!)</h3>
-                <p>Acesse seu painel como um aplicativo, mesmo estando offline.</p>
-            </div>
+  <main class="landing-main" id="inicio">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <span class="badge-tag">⚡ Gestão de Vida & Produtividade</span>
+        <h1>Sua vida organizada.<br><span class="highlight">Sua evolução em um só lugar.</span></h1>
+        <p class="hero-desc">
+          Tarefas, estudos, treinos, alimentação e finanças reunidos em um único espaço — com histórico, métricas e um resumo inteligente do seu mês.
+        </p>
+        <div class="hero-actions">
+          <a href="dashboard.html" class="btn-main-glow">Acessar Dashboard</a>
+          <a href="#sobre" class="btn-secondary-link">Conhecer a história ↓</a>
         </div>
-    </section>
-
-    <section id="about">
-      <div class="about-container">
-          <div class="about-text">
-              <h2 class="section-title">Por que o CoreTask?</h2>
-              <p>
-                  O CoreTask não nasceu como um exercício acadêmico, mas como uma <b>solução real para um problema pessoal</b>. Eu precisava de um sistema de organização que fosse eficiente, mas me deparei com ferramentas complexas ou que exigiam assinaturas caras.
-              </p>
-              <p>
-                  Acredito que a organização pessoal e financeira não deve ser um luxo pago. Por isso, criei uma plataforma onde <b>você é o dono dos seus dados</b>. 
-              </p>
-              <div class="about-highlights">
-                  <div class="h-item">
-                      <span>💰</span>
-                      <p><strong>Custo Zero:</strong> Ferramentas profissionais sem taxas mensais.</p>
-                  </div>
-                  <div class="h-item">
-                      <span>🔒</span>
-                      <p><strong>Privacidade Total:</strong> Seus dados financeiros ficam no seu navegador, não em servidores.</p>
-                  </div>
-              </div>
-          </div>
-          <div class="about-image">
-              <img src="assets/undraw_to-do-list_eoia.svg" alt="Metas Pessoais">
-          </div>
       </div>
     </section>
 
-    <section id="contact">
-    <div class="container">
-        <h2 class="section-title">Vamos conversar?</h2>
-        <p>Se você gostou do <strong>CoreTask</strong> ou quer saber mais sobre meu processo de desenvolvimento, sinta-se à vontade para se conectar!</p>
-        
-        <div class="contact-buttons">
-            <a href="https://www.linkedin.com/in/natasha-m-460719316/" target="_blank" class="btn-contact linkedin">
-                <img src="assets/linkedin-svgrepo-com.svg" alt=""> LinkedIn
-            </a>
-            <a href="https://github.com/Natys2" target="_blank" class="btn-contact github">
-                <img src="assets/github-mark.svg" alt=""> GitHub
-            </a>
-            <a href="mailto:natashamassetti@gmail.com" class="btn-contact email">
-                <span>📧</span> Enviar E-mail
-            </a>
+    <!-- Seção: A História de Origem -->
+    <section class="story-section" id="sobre">
+      <div class="story-container">
+        <div class="story-text">
+          <h2>Como o CoreTask nasceu?</h2>
+          <p>
+            O CoreTask começou como um projeto estritamente pessoal. Eu precisava de uma ferramenta prática para organizar minha própria rotina, meus estudos e minhas finanças, mas me deparava com softwares complexos demais ou que exigiam assinaturas caras para o básico.
+          </p>
+          <p>
+            Com o tempo, a ferramenta evoluiu: ganhou histórico por data, novos módulos de rotina e até inteligência artificial para analisar o mês. Até que amigos e outras pessoas começaram a pedir acesso. 
+          </p>
+          <p class="story-quote">
+            Hoje, ele continua sendo desenvolvido com a mesma essência: centralizar o que importa sem cobrar mensalidade para você simplesmente gerir a própria vida.
+          </p>
         </div>
-    </div>
+      </div>
     </section>
-</main>
-<footer>
-    <div class="footer-content">
-        <p>© 2026 CoreTask. Licença MIT.</p>
-        <p>Desenvolvido por <strong>Natasha Souza</strong></p>
-        <div class="footer-links">
-            <a href="https://github.com/Natys2" target="_blank"><img width="20px" src="assets/github-mark.svg" alt="">GitHub</a>
-            <a href="https://www.linkedin.com/in/natasha-m-460719316/" target="_blank"><img src="assets/linkedin-svgrepo-com.svg" alt="">LinkedIn</a>
+
+    <!-- Seção: O Que o Sistema Entrega -->
+    <section class="features-section" id="recursos">
+      <div class="section-header">
+        <h2>Tudo o que você registra, centralizado</h2>
+        <p>Projetado para funcionar perfeitamente tanto no computador quanto no celular.</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Rotina & Tarefas</h3>
+          <p>Organize suas demandas diárias com navegação por datas e histórico imutável.</p>
         </div>
-        <p class="privacy-note">🔒 Seus dados financeiros nunca saem do seu navegador.</p>
+        <div class="feature-card">
+          <div class="feature-icon">💸</div>
+          <h3>Controle Financeiro</h3>
+          <p>Acompanhe entradas, saídas, metas de economia e gerencie dívidas críticas com segurança.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💪🍽️</div>
+          <h3>Treino & Alimentação</h3>
+          <p>Detalhes de séries, cargas, progresso físico e divisão completa das suas refeições diárias.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Resumo Inteligente (IA)</h3>
+          <p>Uma visão mensal gerada por inteligência artificial interpretando seus dados de rotina.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção: Transparência e Privacidade -->
+    <section class="privacy-section">
+      <div class="privacy-box">
+        <h2>Transparência sobre seus Dados</h2>
+        <div class="privacy-grid">
+          <div class="privacy-item">
+            <h4>💾 Armazenamento Local</h4>
+            <p>Seus registros ficam salvos diretamente no seu navegador utilizando o <code>localStorage</code>. O CoreTask não exige uma conta centralizada para guardar sua rotina.</p>
+          </div>
+          <div class="privacy-item">
+            <h4>🧠 Uso da Inteligência Artificial</h4>
+            <p>Ao solicitar o <strong>Resumo Inteligente</strong>, os dados consolidados do seu mês são enviados temporariamente à API de IA para gerar o relatório personalizado e em seguida descartados.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="roadmap-section" id="roadmap">
+      <h2>Roadmap de Evolução</h2>
+      <div class="roadmap-grid">
+        <div class="roadmap-card">
+          <span class="status-badge em-breve">Em breve</span>
+          <h3>IA Financial Mentor</h3>
+          <p>Consultoria financeira automatizada com base nos seus padrões de gastos.</p>
+        </div>
+        <div class="roadmap-card">
+          <span class="status-badge andamento">Ativo</span>
+          <h3>Interface Mobile Nativa</h3>
+          <p>Navegação otimizada para toque direto no celular com experiência de aplicativo.</p>
+        </div>
+        <div class="roadmap-card">
+          <span class="status-badge planejado">Ativo</span>
+          <h3>Modo PWA Offline</h3>
+          <p>Instalação do painel diretamente na tela inicial do dispositivo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contato -->
+    <section class="contact-section" id="contato">
+      <div class="contact-content">
+        <h2>Vamos conversar?</h2>
+        <p>Se você gostou do CoreTask ou quer acompanhar o desenvolvimento, sinta-se à vontade para se conectar!</p>
+        <div class="social-buttons">
+          <a href="https://linkedin.com" target="_blank" class="social-btn">LinkedIn</a>
+          <a href="https://github.com" target="_blank" class="social-btn">GitHub</a>
+          <a href="mailto:contato@coretask" class="social-btn">Enviar E-mail</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <div class="footer-info">
+      <p>© 2026 CoreTask. Versão atual: 2.1 • Licença MIT.</p>
+      <p>Desenvolvido por <strong>Natasha Souza</strong>.</p>
+      <p class="footer-disclaimer">Seus dados pertencem a você. Transparência e autonomia em primeiro lugar.</p>
     </div>
-</footer>
+  </footer>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => console.log('Service Worker registado com sucesso!', reg))
+        .catch((err) => console.log('Erro ao registar Service Worker:', err));
+    });
+  }
+</script>
 </body>
 </html>
