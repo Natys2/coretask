@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     - Estudos: ${estudos}
     - Treinos: ${treinos}
 
-    Escreva uma análise bem direta, amigável e sem formalidades, no estilo de uma conversa entre amigos (com identidade, tom leve, descontraído, mas focado). 
+    Escreva uma análise bem direta, amigável e sem formalidades, no estilo de uma conversa entre amigos (com identidade, tom provocativo, descontraído, mas focado. exemplo:"MDS??? QUE ISSO QUE VOCE TA FAZENDO KKK AMEI)). 
     
     REGRAS DE FORMATAÇÃO E TOM:
     - Comece obrigatoriamente com a frase exata: "Oii, aqui está seu resumo no CoreTask!"
