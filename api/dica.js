@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Chave de API não configurada no servidor.' });
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
 
   const prompt = `Aja como minha parceira de desenvolvimento e produtividade do CoreTask. 
     Aqui estão os meus dados atuais (apenas do histórico real e do mês atual, ignore qualquer mês futuro):
